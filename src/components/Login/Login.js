@@ -1,7 +1,13 @@
 import React from "react";
 import "./Login.scss";
+import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 
 const Login = (props) => {
+  let history = useHistory();
+
+  const handleCreateNewAccount = () => {
+    history.push("/register");
+  };
   return (
     <div className="login-container">
       <div className="container">
@@ -35,7 +41,12 @@ const Login = (props) => {
             </span>
             <hr />
             <div className="text-center">
-              <button className="create btn py-2 fw-bold">
+              <button
+                className="create btn py-2 fw-bold"
+                onClick={() => {
+                  handleCreateNewAccount();
+                }}
+              >
                 Create new account
               </button>
             </div>
