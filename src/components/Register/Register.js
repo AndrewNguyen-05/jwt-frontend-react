@@ -6,16 +6,70 @@ import { toast } from "react-toastify";
 import axios from "axios";
 
 const Register = (props) => {
-  let [email, setEmail] = useState("");
-  let [phone, setPhone] = useState("");
-  let [username, setUsername] = useState("");
-  let [password, setPassword] = useState("");
-  let [rePassword, setRePassword] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [rePassword, setRePassword] = useState("");
+  const defaultValidInput = {
+    isValidEmail: true,
+    isValidPhone: true,
+    isValidPassword: true,
+    isValidRePassword: true,
+  };
+  const [objCheckInput, setObjCheckInput] = useState(defaultValidInput);
   let history = useHistory();
 
+  const isValidateInputs = () => {
+    if (!email) {
+      toast.error("Email is required!");
+      setObjCheckInput({ ...defaultValidInput, isValidEmail: false });
+      return false;
+    }
+    let regexEmail = /\S+@\S+\.\S+/;
+
+    if (!regexEmail.test(email)) {
+      toast.error("Email is not valid!");
+      setObjCheckInput({ ...defaultValidInput, isValidEmail: false });
+      return false;
+    }
+    if (!phone) {
+      toast.error("Phone number is required!");
+      setObjCheckInput({ ...defaultValidInput, isValidPhone: false });
+      return false;
+    }
+    let regexPhone = /^(\+\d{1,2}\s)?\d{9,12}$/;
+
+    if (!regexPhone.test(phone)) {
+      toast.error("Phone number is not valid!");
+      return false;
+    }
+    if (!password) {
+      toast.error("Password is required!");
+      setObjCheckInput({ ...defaultValidInput, isValidPassword: false });
+      return false;
+    }
+
+    if (rePassword !== password) {
+      toast.error("Password is not match!");
+      setObjCheckInput({ ...defaultValidInput, isValidRePassword: false });
+      return false;
+    }
+
+    return true;
+  };
+
   const handleRegister = () => {
-    toast.success("Wow so easy !");
-    let userData = { email, phone, username, password };
+    let check = isValidateInputs();
+    console.log(">>> check validate: ", check);
+    if (check === true) {
+      axios.post("http://localhost:8080/api/v1/register", {
+        email,
+        phone,
+        username,
+        password,
+      });
+    }
   };
 
   const handleLogin = () => {
@@ -23,9 +77,9 @@ const Register = (props) => {
   };
 
   useEffect(() => {
-    // axios.get("http://localhost:8080/api/test-api").then((data) => {
-    //   console.log(">>> check data:", data);
-    // });
+    axios.get("http://localhost:8080/api/v1/test-api").then((data) => {
+      console.log(">>> check data:", data);
+    });
   }, []);
   return (
     <div className="register-container">
@@ -44,7 +98,11 @@ const Register = (props) => {
               <label>Email:</label>
               <input
                 type="text"
-                className="input form-control"
+                className={
+                  objCheckInput.isValidEmail
+                    ? "input form-control"
+                    : "input form-control is-invalid"
+                }
                 placeholder="Email address"
                 onChange={(event) => {
                   setEmail(event.target.value);
@@ -55,7 +113,11 @@ const Register = (props) => {
               <label>Phone number:</label>
               <input
                 type="text"
-                className="input form-control"
+                className={
+                  objCheckInput.isValidPhone
+                    ? "input form-control"
+                    : "input form-control is-invalid"
+                }
                 placeholder="Phone number"
                 onChange={(event) => {
                   setPhone(event.target.value);
@@ -77,7 +139,11 @@ const Register = (props) => {
               <label>Password:</label>
               <input
                 type="password"
-                className="input form-control"
+                className={
+                  objCheckInput.isValidPassword
+                    ? "input form-control"
+                    : "input form-control is-invalid"
+                }
                 placeholder="New password"
                 onChange={(event) => {
                   setPassword(event.target.value);
@@ -88,7 +154,11 @@ const Register = (props) => {
               <label>Re-enter password:</label>
               <input
                 type="password"
-                className="input form-control"
+                className={
+                  objCheckInput.isValidRePassword
+                    ? "input form-control"
+                    : "input form-control is-invalid"
+                }
                 placeholder="Re-enter password"
                 onChange={(event) => {
                   setRePassword(event.target.value);
