@@ -38,7 +38,26 @@ const Login = (props) => {
     let loginCheck = isValidLogin();
     if (loginCheck) {
       let response = await loginUser(valueLogin, password);
-      console.log(">>> check response: ", response.data);
+      if (response && response.data && +response.data.EC === 0) {
+        //success
+        let data = {
+          isAuthenticated: true,
+          token: "fake token",
+        };
+        sessionStorage.setItem("account", JSON.stringify(data));
+        toast.success(response.data.EM);
+        history.push("/users");
+        window.location.reload();
+      } else if (response && response.data && +response.data.EC !== 0) {
+        //fail
+        toast.error(response.data.EM);
+      }
+    }
+  };
+
+  const handlePressEnter = (event) => {
+    if (event.code === "Enter") {
+      handleLogin();
     }
   };
 
@@ -77,6 +96,9 @@ const Login = (props) => {
               }
               onChange={(event) => {
                 setPassword(event.target.value);
+              }}
+              onKeyDown={(event) => {
+                handlePressEnter(event);
               }}
               placeholder="Password"
             />
